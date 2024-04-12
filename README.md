@@ -1,3 +1,3 @@
 # geo-math
 
-Describe your project here.
+My small Project to display a coordinate-system in the console and interact with it.
