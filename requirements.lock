@@ -8,3 +8,12 @@
 #   with-sources: false
 
 -e file:.
+curses-menu==0.8.1
+    # via geo-math
+deprecated==1.2.14
+    # via curses-menu
+windows-curses==2.3.2
+    # via curses-menu
+    # via geo-math
+wrapt==1.16.0
+    # via deprecated
