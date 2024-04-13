@@ -15,9 +15,15 @@ indexes = {
     }
 }
 
+def get_coordinates():
+    return coordinates
+
+def get_dimentions():
+    return [width, height]
+
 def initScreen(x, y):
     try:
-        coordinate_system = curses.newwin(y, x, 0, 0)
+        coordinate_system = curses.newwin(y, x, 1, 1)
 
         return coordinate_system
     except:
@@ -27,6 +33,9 @@ def initScreen(x, y):
 def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
     global middle_x
     global middle_y
+
+    global height
+    global width
     try:
             
         # Get height and width of window
@@ -40,10 +49,8 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
         rate_x = 1 / space_x 
 
 
-        # Clear and display debug info
+        # Clear
         coordinate_system.clear()
-        coordinate_system.addstr(0, 0, f"Window Size: {height}|{width}", curses.A_STANDOUT)
-        coordinate_system.addstr(1, 0, f"Middle: {middle_x}|{middle_y}", curses.A_STANDOUT)
 
         # Render the Y-Axis (Without numbers)
         len_y = 0
@@ -71,7 +78,7 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
         # Render the X-Axis (without values)
         len_x = 0
         for i in range(0, width, 1):
-            coordinate_system.addstr(middle_x, i, "-")
+            coordinate_system.addstr(middle_x, i, f"-")
             len_x += 1
         
         # Render positive values (X-Axis)
@@ -115,7 +122,7 @@ def draw(coordinate_system):
         else:
             y = indexes["Y"][y_value]
 
-        coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})")
+        coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
     coordinate_system.refresh()
 
 
