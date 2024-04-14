@@ -1,8 +1,6 @@
 import curses
+from utils import draw_line
 
-def draw_line(info_win, line, width):
-    for i in range(width):
-            info_win.addstr(line, i, "_")
 
 def initWindow(y:int, x:int, end_x:int):
     global width, height
@@ -15,6 +13,7 @@ def initWindow(y:int, x:int, end_x:int):
 
         # Basic Title
         info_win.addstr(1, 1, "INFO-WINDOW", curses.A_STANDOUT)
+        draw_line(info_win, 2, width)
         info_win.refresh()
 
         # Return info_win object
@@ -34,7 +33,7 @@ def display(coordinates, dimentions_c_s, info_win):
     info_win.addstr(5, 1, f"Points")
     draw_line(info_win, 6, width)
 
-    # Render all drawn coordinates
+    # Display all coordinates
     line = 7
     for coordinate in coordinates()['P']:
         info_win.addstr(line, 2, f"X ({coordinate[0]}|{coordinate[1]})")
