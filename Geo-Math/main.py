@@ -43,7 +43,7 @@ def main(stdscr):
     console_window = console.initWindow(width_left, 8, remaining_width, 1)
 
     # Draw coordinate-system and draw coordinates
-    coordinate_system.draw_coordinate_system(window, space_x=4, space_y=2)
+    coordinate_system.draw_coordinate_system(window, space_x=5, space_y=2)
 
     # If info menu init display data
     if info_win:
