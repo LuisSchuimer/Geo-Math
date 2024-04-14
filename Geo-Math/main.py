@@ -9,7 +9,7 @@ def main(stdscr):
     stdscr.clear()
     height, width = stdscr.getmaxyx()
 
-    # Initilise window for coordinate-system
+    # Initialise window for coordinate-system
 
     x = 100
     y = 47
@@ -18,7 +18,7 @@ def main(stdscr):
     while not window:
         # Try init
         window = coordinate_system.initScreen(x, y)
-        # Ajust window size if to big
+        # Adjust window size if to big
         if not window:
             # 
             if x != 20:
@@ -28,23 +28,22 @@ def main(stdscr):
                     y = 60
             else:
                 # Trow a exception
-                Exception("Could not initilise Coordinate-System screen")
+                Exception("Could not initialise Coordinate-System screen")
     
     cs_x = x
 
-    # Initilise the info-window
+    # Initialise the info-window
     remaining_width = 1 + cs_x
     info_x = int(round(remaining_width / 2, 1))
     info_win = info_window.initWindow(height -2, info_x, remaining_width)
 
-    # Initilise Console Window
-    remaining_width = 1 + cs_x + info_x
+    # Initialise Console Window
+    remaining_width = 3 + cs_x + info_x
     width_left = width - remaining_width
     console_window = console.initWindow(width_left, 8, remaining_width, 1)
 
     # Draw coordinate-system and draw coordinates
     coordinate_system.draw_coordinate_system(window, space_x=4, space_y=2)
-    coordinate_system.draw(window)
 
     # If info menu init display data
     if info_win:
@@ -65,6 +64,7 @@ def main(stdscr):
         console_window.border()
         console_window.refresh()
 
+    console.start_console(console_window, window, info_win)
     # Wait for user key press to stop program
     window.getch()
     curses.endwin()

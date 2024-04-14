@@ -38,3 +38,6 @@ def display(coordinates, dimentions_c_s, info_win):
     for coordinate in coordinates()['P']:
         info_win.addstr(line, 2, f"X ({coordinate[0]}|{coordinate[1]})")
         line += 1
+    
+    info_win.border()
+    info_win.refresh()

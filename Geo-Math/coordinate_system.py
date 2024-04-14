@@ -37,6 +37,7 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
     global height
     global width
     try:
+        coordinate_system.clear()
             
         # Get height and width of window
         height, width = coordinate_system.getmaxyx()
@@ -100,6 +101,9 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
             
 
         coordinate_system.addstr(middle_x, middle_y, f"0", curses.A_STANDOUT)
+
+        coordinate_system.border()
+        coordinate_system.refresh()
     
     
     except Exception as e:
