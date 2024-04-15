@@ -10,7 +10,15 @@ My small Project to display a coordinate-system in the console and interact with
     - 'x,y' tells the programm, where to put the point in the coordinate-system
 - Press 'Enter'
 
-### 2. Zooming
+### 2. Adding Functions
+- Enter `add f (func)` (Replace '(func)' with your function) into the 'Commands' Tab
+    - 'add' tells the program, to add something
+    - 'f' tells the program, to add a function
+    - '(func)' tells the program, what function to add
+- Press 'Enter'
+- INFO: At this time only functions with one 'x' are supported, like: `x*2 or x-1`
+
+### 3. Zooming
 - Tell the coordinate-system, how big the spaces between full numbers should be
 - Enter `zoom x/y scale` (choose from x/y and replace 'scale' with your own value) into the 'Commands' Tab
     - 'zoom' tells the program, that you want to edit the coordinate-system
