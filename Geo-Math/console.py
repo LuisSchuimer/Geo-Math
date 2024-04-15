@@ -22,7 +22,7 @@ def display(window):
     draw_line(window, 2, width)
 
     # Display command win
-    window.addstr(3, 1, f">")
+    window.addstr(3, 1, f">#")
     # Get pointer x and y
     y, x = window.getyx()
 
@@ -38,28 +38,40 @@ def start_console(window, cs_window, info_window):
     # Initialise commands
     command_utils = commands.command(cs_window, info_window)
 
+    window.keypad(True)
     # Writing loop
     typing = True
     while typing:
         # Get key from user
-        key = get_input(window)
+        key_ch = get_input(window)
 
         # If key is not 'Enter' continue
-        if key != "\n":
-            # Add key to buffer
-            buffer_command += key
+        if key_ch != 10:
+            if key_ch == 8:
+                buffer_command = buffer_command[:-1]
+            else:
+                # Add key to buffer
+                buffer_command += chr(key_ch)
 
-            # Update screen info
-            window.addstr(3, 1, f">{buffer_command}")
+            # Clear screen info
+            window.clear()
+
+            # Update Screen info
+            display(window)
+            window.addstr(3, 1, f">{buffer_command}#")
             y, x = window.getyx()
             window.addstr(6, 1, f"Cursor POS: {x-2}|{y-3}", curses.A_STANDOUT)
             window.border()
             window.refresh()
+
         else:
             # If 'Enter' pressed process command
             command_utils.runCommand(buffer_command)
 
             # Reset screen for next
             buffer_command = ""
+             # Clear screen info
             window.clear()
+
+            # Update Screen info
             display(window)

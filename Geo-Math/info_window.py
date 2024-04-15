@@ -11,10 +11,6 @@ def initWindow(y:int, x:int, end_x:int):
         # Get width
         height, width = info_win.getmaxyx()
 
-        # Basic Title
-        info_win.addstr(1, 1, "INFO-WINDOW", curses.A_STANDOUT)
-        draw_line(info_win, 2, width)
-        info_win.refresh()
 
         # Return info_win object
         return info_win
@@ -22,11 +18,19 @@ def initWindow(y:int, x:int, end_x:int):
         # Return false if error
         return False
 
-def display(coordinates, dimentions_c_s, info_win):
+def display(coordinates, dimentions_c_s, info_win, rate):
+    # Clear screen
+    info_win.clear()
+
     # Define page-end
     page_end = height-4
 
+    # Title
+    info_win.addstr(1, 1, "INFO-WINDOW", curses.A_STANDOUT)
+    draw_line(info_win, 2, width)
+
     draw_line(info_win, height-4, width)
+    info_win.addstr(height-3, 2, f"RATE X/Y: {rate[0]}|{rate[1]} units", curses.A_STANDOUT)
     info_win.addstr(height-2, 2, f"COORDINATE-SYSTEM WINDOW: {dimentions_c_s()[0]}x{dimentions_c_s()[1]}", curses.A_STANDOUT)
 
     # Add Title

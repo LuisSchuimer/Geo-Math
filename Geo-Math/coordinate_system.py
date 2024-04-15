@@ -1,5 +1,8 @@
 import curses
+from decimal import Decimal, getcontext
+import utils
 
+getcontext().prec = 4  # Set the precision to 4 places
 
 coordinates = {
     "P": []
@@ -15,11 +18,21 @@ indexes = {
     }
 }
 
+
+# Functions to give back data
 def get_coordinates():
     return coordinates
 
 def get_dimentions():
     return [width, height]
+
+def get_rate():
+    return [rate_x, rate_y]
+
+def get_max_indexes():
+    return [max_x_positive, max_x_negative], [max_y_positive, max_y_negative]
+
+
 
 def initScreen(x, y):
     try:
@@ -36,7 +49,20 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
 
     global height
     global width
+
+    global rate_x
+    global rate_y
+
+    global max_x_positive
+    global max_y_positive
+    global max_x_negative
+    global max_y_negative
+
     try:
+        # Clear indexes of X, Y
+        indexes["X"].clear()
+        indexes["Y"].clear()
+
         coordinate_system.clear()
             
         # Get height and width of window
@@ -46,8 +72,11 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
         middle_x = height // 2
         middle_y = width // 2
 
-        rate_y = 1 / space_y
-        rate_x = 1 / space_x 
+        # Using Decimal for precise division
+        rate_y = Decimal('1') / Decimal(space_y)
+        rate_x = Decimal('1') / Decimal(space_x)
+        rate_y = rate_y.quantize(Decimal('0.1'))  # quantizing to 1 decimal place
+        rate_x = rate_x.quantize(Decimal('0.01')) # quantizing to 2 decimal places
 
 
         # Clear
@@ -58,47 +87,72 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
         for i in range(0, height, 1):
             coordinate_system.addstr(i, middle_y, "|")
             len_y += 1
-            
-
-        # Render negative values (Y-Axis)
-        index = 0
-        for i in range(middle_x, height, space_y):
-            coordinate_system.addstr(i, middle_y, f"# {index}")
-            indexes["Y"][index] = i
-            index -= 1
         
-        # Render positive values (Y-Axis)
-        index = 0
-        for i in range(middle_x, 0, -space_y):
-            coordinate_system.addstr(i, middle_y, f"# {index}")
-            indexes["Y"][index] = i
-            index += 1
-
-
-
         # Render the X-Axis (without values)
         len_x = 0
         for i in range(0, width, 1):
             coordinate_system.addstr(middle_x, i, f"-")
             len_x += 1
         
-        # Render positive values (X-Axis)
-        index = 1
-        for i in range(middle_y +space_x, width, space_x):
-            coordinate_system.addstr(middle_x, i, "#")
-            coordinate_system.addstr(middle_x -1, i, f"{index}")
-            indexes["X"][index] = i
-            index += 1
+        # Display and Index positive values (X-Axis)
+        index = 0
+        count = 0
+        for i in range(middle_y, width, 1):
+            if count == space_x:
+                coordinate_system.addstr(middle_x, i, "#")
+                coordinate_system.addstr(middle_x -1, i, f"{round(index, utils.count_decimal_places(index))}")
+                count = 0
+            indexes['X'][str(round(index, utils.count_decimal_places(index)))] = i
+            index += round(rate_x, 1)
+
+            count += 1
         
-        # Render negative values (X-Axis)
-        index = -1
-        for i in range(middle_y -space_x, 0, -space_x):
-            coordinate_system.addstr(middle_x, i, "#")
-            coordinate_system.addstr(middle_x -1, i, f"{index}")
-            indexes["X"][index] = i
-            index -= 1
+        max_x_positive = index
         
-            
+
+        # Display and Index negative values (X-Axis)
+        index = 0
+        count = 0
+        for i in range(middle_y, 0, -1):
+            if count == space_x:
+                coordinate_system.addstr(middle_x, i, "#")
+                coordinate_system.addstr(middle_x -1, i-1, f"{round(index, utils.count_decimal_places(index))}")
+                count = 0
+            indexes['X'][str(round(index, utils.count_decimal_places(index)))] = i
+            index -= round(rate_x, 1)
+
+            count += 1
+        
+        max_x_negative = index
+        
+        
+        # Display and Index negative values (Y-Axis)
+        index = 0
+        count = 0
+        for i in range(middle_x, height, 1):
+            if count == space_y:
+                coordinate_system.addstr(i, middle_y, f"# {round(index, utils.count_decimal_places(index))}")
+                count = 0
+            indexes['Y'][str(round(index, utils.count_decimal_places(index)))] = i
+            index -= rate_y
+
+            count += 1
+
+        max_y_negative = index
+
+        # Display and Index positive values (Y-Axis)
+        index = 0
+        count = 0
+        for i in range(middle_x, 0, -1):
+            if count == space_y:
+                coordinate_system.addstr(i, middle_y, f"# {round(index, utils.count_decimal_places(index))}")
+                count = 0
+            indexes['Y'][str(round(index, utils.count_decimal_places(index)))] = i
+            index += rate_y
+
+            count += 1
+
+        max_y_positive = index            
 
         coordinate_system.addstr(middle_x, middle_y, f"0", curses.A_STANDOUT)
 
@@ -118,13 +172,19 @@ def draw(coordinate_system):
         if x_value == 0:
             x = middle_y
         else:
-            x = indexes["X"][x_value]
-        
+            try:
+                x = indexes['X'][str(x_value)]
+            except KeyError:
+                x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
+
         if y_value == 0:
             y = middle_x
 
         else:
-            y = indexes["Y"][y_value]
+            try:
+                y = indexes['Y'][str(y_value)]
+            except KeyError:
+                y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
 
         coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
     coordinate_system.refresh()
