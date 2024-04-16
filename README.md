@@ -1,6 +1,6 @@
-# geo-math
+# Geo-Math
 
-My small Project to display a coordinate-system in the console and interact with it.
+A coordinate-system in your Terminal
 
 ## Commands
 ### 1. Add Point
