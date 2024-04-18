@@ -10,6 +10,7 @@ class command:
         self.default_y = 2
         self.last_x = self.default_x
         self.last_y = self.default_y
+        self.offset = [0, 0]
 
 
     def runCommand(self, command):
@@ -26,12 +27,8 @@ class command:
                 
                 elif "add f" in command:
                     command_type, type, func = command.split(" ")
-                    coordinate_system.get_max_indexes()
 
-                    func_coordinates = functions.calcFunc(func)
-
-                    for coordinate in func_coordinates:
-                        coordinate_system.new_coordinate([coordinate[0], coordinate[1]])
+                    coordinate_system.new_function(func)
                     
                     coordinate_system.draw(self.coordinate_system_win)
 
@@ -53,12 +50,31 @@ class command:
                 else:
                     self.last_x = self.default_x
                     self.last_y = self.default_y
-                    coordinate_system.draw_coordinate_system(self.coordinate_system_win, space_x=5, space_y=2)
+                    coordinate_system.draw_coordinate_system(self.coordinate_system_win, space_x=self.default_x, space_y=self.default_y)
                 
                 info_window.display(coordinate_system.get_coordinates, coordinate_system.get_dimentions, self.info_window, coordinate_system.get_rate())
 
                 coordinate_system.draw(self.coordinate_system_win)
+            
+
         
         except Exception as e:
             self.coordinate_system_win.addstr(4,3, f"{e}")
             self.coordinate_system_win.refresh()
+
+
+
+    def offset_coordinate_system(self, key):
+            if key == 259: # ARROW UP
+                self.offset[0] += 1 # Move up 
+            elif key == 258: # ARROW DOWN
+                self.offset[0] -= 1 # Move down
+            elif key == 260: # ARROW LEFT
+                self.offset[1] += 1 # Move left
+            elif key == 261: # ARROW RIGHT
+                self.offset[1] -= 1 # Move right
+        
+            coordinate_system.draw_coordinate_system(self.coordinate_system_win, space_x=self.last_x, space_y=self.last_y, offset=self.offset)
+            coordinate_system.update()
+            coordinate_system.draw(self.coordinate_system_win)
+            info_window.display(coordinate_system.get_coordinates, coordinate_system.get_dimentions, self.info_window, coordinate_system.get_rate())

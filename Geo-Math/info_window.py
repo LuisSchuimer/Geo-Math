@@ -22,6 +22,14 @@ def display(coordinates, dimentions_c_s, info_win, rate):
     # Clear screen
     info_win.clear()
 
+    # Define color pair 1 with red text on black background
+    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
+    # Define color pair 2 with green text on black background
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+
+    RED = curses.color_pair(1)
+    GREEN = curses.color_pair(2)
+
     # Define page-end
     page_end = height-4
 
@@ -40,8 +48,29 @@ def display(coordinates, dimentions_c_s, info_win, rate):
     # Display all coordinates
     line = 7
     for coordinate in coordinates()['P']:
-        info_win.addstr(line, 2, f"X ({coordinate[0]}|{coordinate[1]})")
+        if coordinate[2]:
+            info_win.addstr(line, 2, f"X ({coordinate[0]}|{coordinate[1]})", GREEN)
+        else:
+            info_win.addstr(line, 2, f"X ({coordinate[0]}|{coordinate[1]})", RED)
         line += 1
+    
+
+    # Add Title
+    info_win.addstr(line +2, 1, f"Functions")
+    draw_line(info_win, line+3, width)
+
+    line = line + 4
+    functions = list(coordinates()['F'].keys())
+    for function in functions:
+        info_win.addstr(line, 2, f"f(x)={function}")
+        draw_line(info_win, line+1, width)
+        line += 2
+        for coordinate in coordinates()['F'][function]:
+            info_win.addstr(line, 4, f"X ({coordinate[0]}|{coordinate[1]})")
+            line += 1 
+        draw_line(info_win, line, width)
+        line += 1
+
     
     info_win.border()
     info_win.refresh()

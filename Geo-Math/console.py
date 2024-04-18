@@ -22,7 +22,7 @@ def display(window):
     draw_line(window, 2, width)
 
     # Display command win
-    window.addstr(3, 1, f">#")
+    window.addstr(3, 1, f">")
     # Get pointer x and y
     y, x = window.getyx()
 
@@ -46,7 +46,7 @@ def start_console(window, cs_window, info_window):
         key_ch = get_input(window)
 
         # If key is not 'Enter' continue
-        if key_ch != 10:
+        if key_ch != 10 and key_ch != 259 and key_ch != 258 and key_ch != 260 and key_ch != 261:
             if key_ch == 8:
                 buffer_command = buffer_command[:-1]
             else:
@@ -58,13 +58,13 @@ def start_console(window, cs_window, info_window):
 
             # Update Screen info
             display(window)
-            window.addstr(3, 1, f">{buffer_command}#")
+            window.addstr(3, 1, f">{buffer_command}|")
             y, x = window.getyx()
             window.addstr(6, 1, f"Cursor POS: {x-2}|{y-3}", curses.A_STANDOUT)
             window.border()
             window.refresh()
 
-        else:
+        elif key_ch == 10:
             # If 'Enter' pressed process command
             command_utils.runCommand(buffer_command)
 
@@ -75,3 +75,7 @@ def start_console(window, cs_window, info_window):
 
             # Update Screen info
             display(window)
+        
+        else:
+            command_utils.offset_coordinate_system(key_ch)
+    

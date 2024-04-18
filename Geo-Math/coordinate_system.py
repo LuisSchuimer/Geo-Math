@@ -1,11 +1,13 @@
 import curses
 from decimal import Decimal, getcontext
 import utils
+import functions
 
 getcontext().prec = 4  # Set the precision to 4 places
 
 coordinates = {
-    "P": []
+    "P": [],
+    "F": {}
 }
 
 indexes = {
@@ -43,7 +45,7 @@ def initScreen(x, y):
         return False
     
 
-def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
+def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:list = None):
     global middle_x
     global middle_y
 
@@ -68,9 +70,13 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
         # Get height and width of window
         height, width = coordinate_system.getmaxyx()
 
-        # Calculate the middle position
-        middle_x = height // 2
-        middle_y = width // 2
+        if not offset:
+            # Calculate the middle position
+            middle_x = height // 2
+            middle_y = width // 2
+        else:
+            middle_x = height // 2 + offset[0]
+            middle_y = height // 2 + offset[1]
 
         # Using Decimal for precise division
         rate_y = Decimal('1') / Decimal(space_y)
@@ -156,15 +162,16 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int):
 
         coordinate_system.addstr(middle_x, middle_y, f"0", curses.A_STANDOUT)
 
+
         coordinate_system.border()
         coordinate_system.refresh()
     
     
-    except Exception as e:
-        print(e)
-        input()
+    except:
+        pass
 
 def draw(coordinate_system):
+    # Draw Points
     for coordinate in coordinates['P']:
         x_value = coordinate[0]
         y_value = coordinate[1]
@@ -185,12 +192,74 @@ def draw(coordinate_system):
                 y = indexes['Y'][str(y_value)]
             except KeyError:
                 y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
+        if float(y_value) <= max_y_positive -1 and float(y_value) >= max_y_negative +1 and float(x_value) <= max_x_positive-1 and float(x_value) >= max_x_negative-1:
+            coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
+            try:
+                coordinate[2] = True
+            except:
+                coordinate.append(True)
+        else:
+            try:
+                coordinate[2] = False
+            except:
+                coordinate.append(False)
 
-        coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
+    # Draw functions
+    all_functions = list(coordinates['F'].keys())
+    for function in all_functions:
+        for coordinate in coordinates['F'][function]:
+            x_value = coordinate[0]
+            y_value = coordinate[1]
+
+            if x_value == 0:
+                x = middle_y
+            else:
+                try:
+                    x = indexes['X'][str(x_value)]
+                except KeyError:
+                    x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
+
+            if y_value == 0:
+                y = middle_x
+
+            else:
+                try:
+                    y = indexes['Y'][str(y_value)]
+                except KeyError:
+                    y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
+            
+            if y_value <= max_y_positive -1 and y_value >= max_y_negative +1:
+                coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
+
+            
     coordinate_system.refresh()
+
 
 
 def new_coordinate(coordinate:list):
     x_value = coordinate[0]
     y_value = coordinate[1]
     coordinates["P"].append([x_value, y_value])
+
+
+def new_function(function):
+    coordinates["F"][function] = []
+    max_x, max_y = get_max_indexes()
+    func_coordinates = functions.calcFunc(function, max_x, max_y)
+    
+    for coordinate in func_coordinates:
+        coordinates["F"][function].append([coordinate[0], coordinate[1]])
+
+# Update all functions
+def update():
+    all_functions = list(coordinates['F'].keys())
+    for function in all_functions:
+        coordinates["F"][function] = []
+        max_x, max_y = get_max_indexes()
+        func_coordinates = functions.calcFunc(function, max_x, max_y)
+
+        for coordinate in func_coordinates:
+            coordinates["F"][function].append([coordinate[0], coordinate[1]])
+
+
+
