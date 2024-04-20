@@ -91,27 +91,36 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         # Render the Y-Axis (Without numbers)
         len_y = 0
         for i in range(0, height, 1):
-            coordinate_system.addstr(i, middle_y, "|")
-            len_y += 1
+            try:
+                coordinate_system.addstr(i, middle_y, "|")
+                len_y += 1
+            except:
+                continue
         
         # Render the X-Axis (without values)
         len_x = 0
         for i in range(0, width, 1):
-            coordinate_system.addstr(middle_x, i, f"-")
-            len_x += 1
-        
+            try:
+                coordinate_system.addstr(middle_x, i, f"-")
+                len_x += 1
+            except:
+                continue
+
         # Display and Index positive values (X-Axis)
         index = 0
         count = 0
         for i in range(middle_y, width, 1):
-            if count == space_x:
-                coordinate_system.addstr(middle_x, i, "#")
-                coordinate_system.addstr(middle_x -1, i, f"{round(index, utils.count_decimal_places(index))}")
+            if count >= space_x:
+                try:
+                    coordinate_system.addstr(middle_x, i, "#")
+                    coordinate_system.addstr(middle_x -1, i, f"{round(index, utils.count_decimal_places(index))}")
+                except:
+                    pass
                 count = 0
-            indexes['X'][str(round(index, utils.count_decimal_places(index)))] = i
-            index += round(rate_x, 1)
 
+            indexes['X'][str(round(index, utils.count_decimal_places(index)))] = i
             count += 1
+            index += round(rate_x, 1)
         
         max_x_positive = index
         
@@ -120,14 +129,17 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         index = 0
         count = 0
         for i in range(middle_y, 0, -1):
-            if count == space_x:
-                coordinate_system.addstr(middle_x, i, "#")
-                coordinate_system.addstr(middle_x -1, i-1, f"{round(index, utils.count_decimal_places(index))}")
+            if count >= space_x:
+                try:
+                    coordinate_system.addstr(middle_x, i, "#")
+                    coordinate_system.addstr(middle_x -1, i-1, f"{round(index, utils.count_decimal_places(index))}")
+                except:
+                    pass
                 count = 0
+                
             indexes['X'][str(round(index, utils.count_decimal_places(index)))] = i
-            index -= round(rate_x, 1)
-
             count += 1
+            index -= round(rate_x, 1)
         
         max_x_negative = index
         
@@ -136,13 +148,15 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         index = 0
         count = 0
         for i in range(middle_x, height, 1):
-            if count == space_y:
-                coordinate_system.addstr(i, middle_y, f"# {round(index, utils.count_decimal_places(index))}")
+            if count >= space_y:
+                try: coordinate_system.addstr(i, middle_y, f"# {round(index, utils.count_decimal_places(index))}")
+                except:
+                    pass
                 count = 0
-            indexes['Y'][str(round(index, utils.count_decimal_places(index)))] = i
-            index -= rate_y
 
+            indexes['Y'][str(round(index, utils.count_decimal_places(index)))] = i
             count += 1
+            index -= rate_y
 
         max_y_negative = index
 
@@ -150,18 +164,23 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         index = 0
         count = 0
         for i in range(middle_x, 0, -1):
-            if count == space_y:
-                coordinate_system.addstr(i, middle_y, f"# {round(index, utils.count_decimal_places(index))}")
+            if count >= space_y:
+                try: coordinate_system.addstr(i, middle_y, f"# {round(index, utils.count_decimal_places(index))}")
+                except:
+                    pass
                 count = 0
+                
             indexes['Y'][str(round(index, utils.count_decimal_places(index)))] = i
+            count += 1
             index += rate_y
 
-            count += 1
+            
 
         max_y_positive = index            
 
-        coordinate_system.addstr(middle_x, middle_y, f"0", curses.A_STANDOUT)
-
+        try: coordinate_system.addstr(middle_x, middle_y, f"0", curses.A_STANDOUT) 
+        except: 
+            pass
 
         coordinate_system.border()
         coordinate_system.refresh()
@@ -179,30 +198,28 @@ def draw(coordinate_system):
         if x_value == 0:
             x = middle_y
         else:
-            try:
-                x = indexes['X'][str(x_value)]
-            except KeyError:
-                x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
+            try: x = indexes['X'][str(x_value)]
+            except KeyError: x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
 
         if y_value == 0:
             y = middle_x
 
         else:
-            try:
-                y = indexes['Y'][str(y_value)]
-            except KeyError:
-                y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
+            try: y = indexes['Y'][str(y_value)]
+            except KeyError: y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
+
         if float(y_value) <= max_y_positive -1 and float(y_value) >= max_y_negative +1 and float(x_value) <= max_x_positive-1 and float(x_value) >= max_x_negative-1:
-            coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
             try:
-                coordinate[2] = True
+                coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
+                try: coordinate[2] = True 
+                except: coordinate.append(True)
             except:
-                coordinate.append(True)
+                try: coordinate[2] = False
+                except: coordinate.append(False)
+
         else:
-            try:
-                coordinate[2] = False
-            except:
-                coordinate.append(False)
+            try: coordinate[2] = False
+            except: coordinate.append(False)
 
     # Draw functions
     all_functions = list(coordinates['F'].keys())
@@ -214,22 +231,20 @@ def draw(coordinate_system):
             if x_value == 0:
                 x = middle_y
             else:
-                try:
-                    x = indexes['X'][str(x_value)]
-                except KeyError:
-                    x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
+                try: x = indexes['X'][str(x_value)]
+                except KeyError: x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
 
             if y_value == 0:
                 y = middle_x
 
             else:
-                try:
-                    y = indexes['Y'][str(y_value)]
-                except KeyError:
-                    y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
+                try: y = indexes['Y'][str(y_value)]
+                except KeyError: y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
             
             if y_value <= max_y_positive -1 and y_value >= max_y_negative +1:
-                coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
+                try: coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
+                except: 
+                    pass
 
             
     coordinate_system.refresh()
