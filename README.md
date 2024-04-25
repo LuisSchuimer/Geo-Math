@@ -16,7 +16,7 @@ A coordinate-system in your Terminal
     - 'f' tells the program, to add a function
     - '(func)' tells the program, what function to add
 - Press 'Enter'
-- INFO: At this time only functions with one 'x' are supported, like: `x*2 or x-1`
+- INFO: At this time only functions with one 'x' are supported, like: `x*x*2 or x-1`
 
 ### 3. Zooming
 - Tell the coordinate-system, how big the spaces between full numbers should be
