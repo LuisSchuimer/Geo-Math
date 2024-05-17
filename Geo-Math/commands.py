@@ -34,7 +34,16 @@ class command:
 
                     info_window.display(coordinate_system.get_coordinates, coordinate_system.get_dimentions, self.info_window, coordinate_system.get_rate())
 
+            if "save" in command:
+                command_type, name = command.split(" ")
+
+                coordinate_system.save(name)
             
+            if "load" in command:
+                command_type, name = command.split(" ")
+
+                coordinate_system.load(name, self.coordinate_system_win)
+
             
             if "zoom" in command:
                 if not "def" in command:
@@ -61,6 +70,8 @@ class command:
         except Exception as e:
             self.coordinate_system_win.addstr(4,3, f"{e}")
             self.coordinate_system_win.refresh()
+
+            raise e
 
 
 

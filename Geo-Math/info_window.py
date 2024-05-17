@@ -65,10 +65,10 @@ def display(coordinates, dimentions_c_s, info_win, rate):
         info_win.addstr(line, 2, f"f(x)={function}")
         draw_line(info_win, line+1, width)
         line += 2
-        for coordinate in coordinates()['F'][function]:
-            info_win.addstr(line, 4, f"X ({coordinate[0]}|{coordinate[1]})")
-            line += 1 
-        draw_line(info_win, line, width)
+        #for coordinate in coordinates()['F'][function]:
+        #    if coordinate[2]:
+        #        info_win.addstr(line, 4, f"X ({round(coordinate[0], 2)}|{round(coordinate[1], 2)})")
+        #        line += 1 
         line += 1
 
     

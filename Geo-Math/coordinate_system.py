@@ -92,7 +92,7 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         len_y = 0
         for i in range(0, height, 1):
             try:
-                coordinate_system.addstr(i, middle_y, "|")
+                coordinate_system.addstr(i, middle_y,"|")
                 len_y += 1
             except:
                 continue
@@ -101,8 +101,12 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         len_x = 0
         for i in range(0, width, 1):
             try:
-                coordinate_system.addstr(middle_x, i, f"-")
-                len_x += 1
+                if middle_x <= height:
+                    coordinate_system.addstr(middle_x, i, f"-")
+                    len_x += 1
+                else:
+                    coordinate_system.addstr(height, i, f"-")
+                    len_x += 1
             except:
                 continue
 
@@ -190,41 +194,9 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         pass
 
 def draw(coordinate_system):
-    # Draw Points
-    for coordinate in coordinates['P']:
-        x_value = coordinate[0]
-        y_value = coordinate[1]
-
-        if x_value == 0:
-            x = middle_y
-        else:
-            try: x = indexes['X'][str(x_value)]
-            except KeyError: x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
-
-        if y_value == 0:
-            y = middle_x
-
-        else:
-            try: y = indexes['Y'][str(y_value)]
-            except KeyError: y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
-
-        if float(y_value) <= max_y_positive -1 and float(y_value) >= max_y_negative +1 and float(x_value) <= max_x_positive-1 and float(x_value) >= max_x_negative-1:
-            try:
-                coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
-                try: coordinate[2] = True 
-                except: coordinate.append(True)
-            except:
-                try: coordinate[2] = False
-                except: coordinate.append(False)
-
-        else:
-            try: coordinate[2] = False
-            except: coordinate.append(False)
-
-    # Draw functions
-    all_functions = list(coordinates['F'].keys())
-    for function in all_functions:
-        for coordinate in coordinates['F'][function]:
+    try:
+        # Draw Points
+        for coordinate in coordinates['P']:
             x_value = coordinate[0]
             y_value = coordinate[1]
 
@@ -240,14 +212,58 @@ def draw(coordinate_system):
             else:
                 try: y = indexes['Y'][str(y_value)]
                 except KeyError: y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
-            
-            if y_value <= max_y_positive -1 and y_value >= max_y_negative +1:
-                try: coordinate_system.addstr(y, x, f"X ({x_value}|{y_value})", curses.A_STANDOUT)
-                except: 
-                    pass
 
-            
-    coordinate_system.refresh()
+            if float(y_value) <= max_y_positive -1 and float(y_value) >= max_y_negative +1 and float(x_value) <= max_x_positive-1 and float(x_value) >= max_x_negative-1:
+                try:
+                    coordinate_system.addstr(y, x, f"X ({round(float(x_value), 2)}|{round(float(y_value), 2)})", curses.A_STANDOUT)
+                    try: coordinate[2] = True 
+                    except: coordinate.append(True)
+                except Exception as err:
+                    try: coordinate[2] = False
+                    except: coordinate.append(False)
+
+
+            else:
+                try: coordinate[2] = False
+                except: coordinate.append(False)
+
+
+            coordinate_system.refresh()
+
+        # Draw functions
+        
+        all_functions = list(coordinates['F'].keys())
+        for function in all_functions:
+            for coordinate in coordinates['F'][function]:
+                x_value = coordinate[0]
+                y_value = coordinate[1]
+
+                if x_value == 0: x = middle_y
+                else:
+                    try: x = indexes['X'][str(x_value)]
+                    except KeyError: x = indexes['X'][str(utils.find_closest_key(indexes['X'], x_value))]
+
+                if y_value == 0: y = middle_x
+                else:
+                    try: y = indexes['Y'][str(y_value)]
+                    except KeyError: y = indexes['Y'][str(utils.find_closest_key(indexes['Y'], y_value))]
+                    
+                if y_value <= max_y_positive -1 and y_value >= max_y_negative +1:
+                    if coordinate[2]:
+                        try: coordinate_system.addstr(y, x, f"X ({round(x_value, 2)}|{round(y_value, 2)})", curses.A_STANDOUT)
+                        except: 
+                            pass
+
+                    else:
+                        try: coordinate_system.addstr(y, x, f"#")
+                        except: 
+                            pass
+
+
+        coordinate_system.refresh()
+    
+    except:
+        pass
 
 
 
@@ -260,10 +276,10 @@ def new_coordinate(coordinate:list):
 def new_function(function):
     coordinates["F"][function] = []
     max_x, max_y = get_max_indexes()
-    func_coordinates = functions.calcFunc(function, max_x, max_y)
+    func_coordinates = functions.calcFunc(function, max_x, max_y, [rate_x, rate_y])
     
     for coordinate in func_coordinates:
-        coordinates["F"][function].append([coordinate[0], coordinate[1]])
+        coordinates["F"][function].append([coordinate[0], coordinate[1], coordinate[2]])
 
 # Update all functions
 def update():
@@ -271,10 +287,45 @@ def update():
     for function in all_functions:
         coordinates["F"][function] = []
         max_x, max_y = get_max_indexes()
-        func_coordinates = functions.calcFunc(function, max_x, max_y)
+        func_coordinates = functions.calcFunc(function, max_x, max_y, [rate_x, rate_y])
 
         for coordinate in func_coordinates:
-            coordinates["F"][function].append([coordinate[0], coordinate[1]])
+            coordinates["F"][function].append([coordinate[0], coordinate[1], coordinate[2]])
 
 
+def save(name):
+    import json
 
+    info = [
+        coordinates,
+        [rate_x, rate_y]
+    ]
+
+    with open(f"{name}.gmf", "w") as save_file:
+        json.dump(info, save_file, default=convert_decimal)
+
+def convert_decimal(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
+def load(name, coordinate_system):
+    global coordinates
+
+    import json
+    try:
+        with open(f"{name}.gmf", "r") as load_file:
+            info = json.load(load_file)
+
+            coordinates = info[0]
+
+            update()
+            draw(coordinate_system)
+
+    except json.JSONDecodeError as e:
+        raise e
+    except FileNotFoundError:
+        print(f"File {name}.gmf not found")
+    except Exception as e:
+        raise e
