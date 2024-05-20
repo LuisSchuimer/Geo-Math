@@ -30,3 +30,17 @@ A coordinate-system in your Terminal
     - 'zoom' tells the program, that you want to edit the coordinate-system
     - 'def' tells the program, that you want to return to the defauld zoom
 - Press 'Enter'
+
+### Save/Load .gmf Files
+- Enter `save name` (Replace name with your custom name)
+    - 'save' tells the program, that you wnat to save the current workspace
+    - 'name' tells the program, what name the file should have
+
+  f. e. `save main`, saves the current workspace in 'main.gmf'
+
+- Enter `load name` (Replace name with the filename without the extention)
+    - 'load' tells the program, to load data out of a file
+    - 'name' tells the program, what file you want to load from
+
+  f. e. `load main`, loads a workspace out of a .gmf file (in this case: main.gmf)
+ 
