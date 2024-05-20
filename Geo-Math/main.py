@@ -47,7 +47,7 @@ def main(stdscr):
 
     # If info menu init display data
     if info_win:
-        info_window.display(coordinate_system.get_coordinates, coordinate_system.get_dimentions, info_win, coordinate_system.get_rate())
+        info_window.display(coordinate_system.get_coordinates, coordinate_system.get_dimentions, info_win, coordinate_system.get_rate(), coordinate_system.get_variables())
     
     if console_window:
         console.display(console_window)

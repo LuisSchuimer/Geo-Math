@@ -21,6 +21,8 @@ indexes = {
 }
 
 
+variables = {}
+
 # Functions to give back data
 def get_coordinates():
     return coordinates
@@ -34,6 +36,8 @@ def get_rate():
 def get_max_indexes():
     return [max_x_positive, max_x_negative], [max_y_positive, max_y_negative]
 
+def get_variables():
+    return variables
 
 
 def initScreen(x, y):
@@ -45,7 +49,7 @@ def initScreen(x, y):
         return False
     
 
-def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:list = None):
+def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:list = [0, 0]):
     global middle_x
     global middle_y
 
@@ -70,7 +74,7 @@ def draw_coordinate_system(coordinate_system, space_x:int, space_y:int, offset:l
         # Get height and width of window
         height, width = coordinate_system.getmaxyx()
 
-        if not offset:
+        if offset == [0, 0]:
             # Calculate the middle position
             middle_x = height // 2
             middle_y = width // 2
@@ -276,10 +280,14 @@ def new_coordinate(coordinate:list):
 def new_function(function):
     coordinates["F"][function] = []
     max_x, max_y = get_max_indexes()
-    func_coordinates = functions.calcFunc(function, max_x, max_y, [rate_x, rate_y])
-    
-    for coordinate in func_coordinates:
-        coordinates["F"][function].append([coordinate[0], coordinate[1], coordinate[2]])
+    func_coordinates, func_variables = functions.calcFunc(function, max_x, max_y, [rate_x, rate_y], variables)
+
+    if func_coordinates:
+        for coordinate in func_coordinates:
+            coordinates["F"][function].append([coordinate[0], coordinate[1], coordinate[2]])
+
+    for variable in func_variables:
+        add_variable(variable)
 
 # Update all functions
 def update():
@@ -287,10 +295,15 @@ def update():
     for function in all_functions:
         coordinates["F"][function] = []
         max_x, max_y = get_max_indexes()
-        func_coordinates = functions.calcFunc(function, max_x, max_y, [rate_x, rate_y])
+        func_coordinates, func_variables = functions.calcFunc(function, max_x, max_y, [rate_x, rate_y], variables)
 
-        for coordinate in func_coordinates:
-            coordinates["F"][function].append([coordinate[0], coordinate[1], coordinate[2]])
+        if func_coordinates:
+            for coordinate in func_coordinates:
+                coordinates["F"][function].append([coordinate[0], coordinate[1], coordinate[2]])
+
+
+def add_variable(name, value=None):
+    variables[name] = value
 
 
 def save(name):
@@ -298,7 +311,8 @@ def save(name):
 
     info = [
         coordinates,
-        [rate_x, rate_y]
+        [rate_x, rate_y],
+        variables
     ]
 
     with open(f"{name}.gmf", "w") as save_file:
@@ -311,7 +325,7 @@ def convert_decimal(obj):
 
 
 def load(name, coordinate_system):
-    global coordinates
+    global coordinates, variables
 
     import json
     try:
@@ -319,6 +333,7 @@ def load(name, coordinate_system):
             info = json.load(load_file)
 
             coordinates = info[0]
+            variables = info[2]
 
             update()
             draw(coordinate_system)
@@ -329,3 +344,4 @@ def load(name, coordinate_system):
         print(f"File {name}.gmf not found")
     except Exception as e:
         raise e
+    

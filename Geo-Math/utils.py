@@ -27,6 +27,11 @@ def count_decimal_places(number):
         # minus one (since the index is zero-based)
         return len(number_str) - decimal_point_index - 1
     
+import re
+
+def find_variable_names(expression):
+    characters = re.findall(r'[a-zA-Z]', expression)
+    return characters
 
 
 def find_closest_key(d, current_key):
