@@ -8,6 +8,8 @@ authors = [
 dependencies = [
     "windows-curses>=2.3.2",
     "curses-menu>=0.8.1",
+    "numpy>=1.24.4",
+    "whyslow>=0.1.7",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

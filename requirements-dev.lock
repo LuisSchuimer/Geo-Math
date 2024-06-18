@@ -6,12 +6,21 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
 
 -e file:.
 curses-menu==0.8.1
     # via geo-math
 deprecated==1.2.14
     # via curses-menu
+numpy==1.24.4
+    # via geo-math
+snakeviz==2.2.0
+    # via whyslow
+tornado==6.4.1
+    # via snakeviz
+whyslow==0.1.7
+    # via geo-math
 windows-curses==2.3.2
     # via curses-menu
     # via geo-math

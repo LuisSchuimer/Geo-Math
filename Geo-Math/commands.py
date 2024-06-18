@@ -2,6 +2,7 @@ import coordinate_system
 import info_window
 import functions
 
+
 class command:
     def __init__(self, cs_window, info_window):
         self.coordinate_system_win = cs_window
@@ -58,6 +59,9 @@ class command:
                     coordinate_system.update()
                     coordinate_system.draw(self.coordinate_system_win)
                     info_window.display(coordinate_system.get_coordinates, coordinate_system.get_dimentions, self.info_window, coordinate_system.get_rate(), coordinate_system.get_variables())
+            
+            if "exit" == command:
+                exit(1)
 
             
             if "zoom" in command:

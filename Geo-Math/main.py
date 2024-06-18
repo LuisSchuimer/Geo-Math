@@ -4,6 +4,8 @@ import info_window
 import console
 import curses
     
+def quit():
+    curses.endwin()
 
 def main(stdscr):
     stdscr.clear()
